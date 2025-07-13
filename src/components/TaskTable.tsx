@@ -1,4 +1,6 @@
 import React from 'react';
+import { useApp } from '../contexts/AppContext';
+import TaskModal from './TaskModal';
 import { 
   MoreHorizontal, 
   Calendar, 
@@ -9,92 +11,46 @@ import {
   Edit3,
   UserPlus
 } from 'lucide-react';
-
-interface Task {
-  id: string;
-  name: string;
-  status: 'In progress' | 'Complete' | 'Pending' | 'Blocked';
-  priority: 'Low' | 'Medium' | 'High';
-  assignee: {
-    name: string;
-    avatar: string;
-    initials: string;
-  };
-  dueDate: string;
-  project: string;
-  comments: number;
-  attachments: number;
-}
+import { Task } from '../types';
 
 const TaskTable = () => {
-  const tasks: Task[] = [
-    {
-      id: '1',
-      name: 'Design new landing page hero section',
-      status: 'In progress',
-      priority: 'High',
-      assignee: { name: 'Sarah Chen', avatar: '', initials: 'SC' },
-      dueDate: 'Dec 15',
-      project: 'Website Redesign',
-      comments: 3,
-      attachments: 2
-    },
-    {
-      id: '2',
-      name: 'Implement user authentication flow',
-      status: 'Pending',
-      priority: 'Medium',
-      assignee: { name: 'Mike Johnson', avatar: '', initials: 'MJ' },
-      dueDate: 'Dec 18',
-      project: 'Auth System',
-      comments: 1,
-      attachments: 0
-    },
-    {
-      id: '3',
-      name: 'Write API documentation',
-      status: 'Complete',
-      priority: 'Low',
-      assignee: { name: 'Alex Rodriguez', avatar: '', initials: 'AR' },
-      dueDate: 'Dec 12',
-      project: 'Documentation',
-      comments: 5,
-      attachments: 1
-    },
-    {
-      id: '4',
-      name: 'Set up CI/CD pipeline',
-      status: 'Blocked',
-      priority: 'High',
-      assignee: { name: 'Emily Davis', avatar: '', initials: 'ED' },
-      dueDate: 'Dec 20',
-      project: 'DevOps',
-      comments: 2,
-      attachments: 3
-    },
-    {
-      id: '5',
-      name: 'Conduct user research interviews',
-      status: 'In progress',
-      priority: 'Medium',
-      assignee: { name: 'John Smith', avatar: '', initials: 'JS' },
-      dueDate: 'Dec 16',
-      project: 'User Research',
-      comments: 0,
-      attachments: 0
-    },
-    {
-      id: '6',
-      name: 'Optimize database queries',
-      status: 'Pending',
-      priority: 'High',
-      assignee: { name: 'Lisa Wang', avatar: '', initials: 'LW' },
-      dueDate: 'Dec 22',
-      project: 'Performance',
-      comments: 1,
-      attachments: 0
+  const { tasks, updateTask, deleteTask, viewMode } = useApp();
+  const [selectedTasks, setSelectedTasks] = React.useState<string[]>([]);
+  const [editingTask, setEditingTask] = React.useState<Task | null>(null);
+  const [showTaskModal, setShowTaskModal] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleOpenModal = () => setShowTaskModal(true);
+    window.addEventListener('openNewTaskModal', handleOpenModal);
+    return () => window.removeEventListener('openNewTaskModal', handleOpenModal);
+  }, []);
+
+  const handleSelectTask = (taskId: string) => {
+    setSelectedTasks(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    setSelectedTasks(selectedTasks.length === tasks.length ? [] : tasks.map(t => t.id));
+  };
+
+  const handleStatusChange = (taskId: string, status: Task['status']) => {
+    updateTask(taskId, { status });
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setShowTaskModal(true);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    if (confirm('Are you sure you want to delete this task?')) {
+      deleteTask(taskId);
     }
-  ];
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -122,11 +78,101 @@ const TaskTable = () => {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  if (viewMode === 'grid') {
+    return (
+      <>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Tasks</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your team's work and track progress</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {tasks.map((task) => (
+              <div key={task.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
+                    {task.status}
+                  </span>
+                  <button 
+                    onClick={() => handleDeleteTask(task.id)}
+                    className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                <h3 
+                  className="font-medium text-gray-900 dark:text-white mb-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
+                  onClick={() => handleEditTask(task)}
+                >
+                  {task.name}
+                </h3>
+                
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <span>{task.project}</span>
+                  <div className="flex items-center">
+                    {getPriorityIcon(task.priority)}
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-xs font-medium leading-none">{task.assignee.initials}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
+                    <Calendar className="h-3 w-3" />
+                    <span>{formatDate(task.dueDate)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {showTaskModal && (
+          <TaskModal
+            task={editingTask}
+            onClose={() => {
+              setShowTaskModal(false);
+              setEditingTask(null);
+            }}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
-    <div className="flex-1 overflow-hidden">
+    <>
+      <div className="flex-1 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Tasks</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your team's work and track progress</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Tasks</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your team's work and track progress</p>
+          </div>
+          {selectedTasks.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">{selectedTasks.length} selected</span>
+              <button 
+                onClick={() => selectedTasks.forEach(id => deleteTask(id))}
+                className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -134,7 +180,12 @@ const TaskTable = () => {
           <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0">
             <tr>
               <th className="text-left py-3 px-6 text-sm font-semibold text-gray-900 dark:text-white w-8">
-                <input type="checkbox" className="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700" />
+                <input 
+                  type="checkbox" 
+                  checked={selectedTasks.length === tasks.length && tasks.length > 0}
+                  onChange={handleSelectAll}
+                  className="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700" 
+                />
               </th>
               <th className="text-left py-3 px-6 text-sm font-semibold text-gray-900 dark:text-white">
                 Task Name
@@ -167,34 +218,54 @@ const TaskTable = () => {
                 }`}
               >
                 <td className="py-4 px-6">
-                  <input type="checkbox" className="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700" />
+                  <input 
+                    type="checkbox" 
+                    checked={selectedTasks.includes(task.id)}
+                    onChange={() => handleSelectTask(task.id)}
+                    className="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700" 
+                  />
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{task.name}</span>
+                    <span 
+                      className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
+                      onClick={() => handleEditTask(task)}
+                    >
+                      {task.name}
+                    </span>
                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+                      <button 
+                        onClick={() => handleEditTask(task)}
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                      >
                         <Edit3 className="h-3 w-3" />
                       </button>
-                      {task.comments > 0 && (
+                      {task.comments.length > 0 && (
                         <div className="flex items-center space-x-1 text-gray-400 dark:text-gray-500">
                           <MessageSquare className="h-3 w-3" />
-                          <span className="text-xs">{task.comments}</span>
+                          <span className="text-xs">{task.comments.length}</span>
                         </div>
                       )}
-                      {task.attachments > 0 && (
+                      {task.attachments.length > 0 && (
                         <div className="flex items-center space-x-1 text-gray-400 dark:text-gray-500">
                           <Paperclip className="h-3 w-3" />
-                          <span className="text-xs">{task.attachments}</span>
+                          <span className="text-xs">{task.attachments.length}</span>
                         </div>
                       )}
                     </div>
                   </div>
                 </td>
                 <td className="py-4 px-6">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(task.status)}`}>
-                    {task.status}
-                  </span>
+                  <select
+                    value={task.status}
+                    onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
+                    className={`inline-flex px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap border-0 bg-transparent cursor-pointer ${getStatusColor(task.status)}`}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="In progress">In progress</option>
+                    <option value="Complete">Complete</option>
+                    <option value="Blocked">Blocked</option>
+                  </select>
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex items-center">
@@ -216,14 +287,17 @@ const TaskTable = () => {
                 <td className="py-4 px-6">
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                    <span className="text-sm text-gray-900 dark:text-white">{task.dueDate}</span>
+                    <span className="text-sm text-gray-900 dark:text-white">{formatDate(task.dueDate)}</span>
                   </div>
                 </td>
                 <td className="py-4 px-6">
                   <span className="text-sm text-gray-600 dark:text-gray-400">{task.project}</span>
                 </td>
                 <td className="py-4 px-6">
-                  <button className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+                  <button 
+                    onClick={() => handleDeleteTask(task.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
                     <MoreHorizontal className="h-4 w-4" />
                   </button>
                 </td>
@@ -232,7 +306,18 @@ const TaskTable = () => {
           </tbody>
         </table>
       </div>
-    </div>
+      </div>
+      
+      {showTaskModal && (
+        <TaskModal
+          task={editingTask}
+          onClose={() => {
+            setShowTaskModal(false);
+            setEditingTask(null);
+          }}
+        />
+      )}
+    </>
   );
 };
 

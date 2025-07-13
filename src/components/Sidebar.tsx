@@ -1,4 +1,5 @@
 import React from 'react';
+import { useApp } from '../contexts/AppContext';
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -12,22 +13,29 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
+  const { activeTab, setActiveTab, projects, addProject } = useApp();
+
   const navigationItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', active: false },
-    { icon: CheckSquare, label: 'Tasks', active: true },
-    { icon: Target, label: 'Goals', active: false },
-    { icon: FileText, label: 'Docs', active: false },
-    { icon: Calendar, label: 'Calendar', active: false },
-    { icon: Zap, label: 'Automations', active: false },
-    { icon: Settings, label: 'Settings', active: false },
+    { icon: LayoutDashboard, label: 'Dashboard', key: 'dashboard' as const },
+    { icon: CheckSquare, label: 'Tasks', key: 'tasks' as const },
+    { icon: Target, label: 'Goals', key: 'goals' as const },
+    { icon: FileText, label: 'Docs', key: 'docs' as const },
+    { icon: Calendar, label: 'Calendar', key: 'calendar' as const },
+    { icon: Zap, label: 'Automations', key: 'automations' as const },
+    { icon: Settings, label: 'Settings', key: 'settings' as const },
   ];
 
-  const workspaceItems = [
-    { emoji: '🧠', label: 'My Focus', count: 12 },
-    { emoji: '🚀', label: 'Product Launch', count: 24 },
-    { emoji: '📈', label: 'Marketing', count: 8 },
-    { emoji: '💡', label: 'Ideas', count: 15 },
-  ];
+  const handleAddProject = () => {
+    const name = prompt('Enter project name:');
+    if (name) {
+      const emoji = prompt('Enter project emoji (optional):') || '📁';
+      addProject({
+        name,
+        emoji,
+        color: 'blue',
+      });
+    }
+  };
 
   return (
     <div className="w-60 bg-gray-50 dark:bg-gray-800 h-screen flex flex-col border-r border-gray-200 dark:border-gray-700">
@@ -47,18 +55,18 @@ const Sidebar = () => {
       <div className="flex-1 py-4">
         <nav className="space-y-1 px-3">
           {navigationItems.map((item, index) => (
-            <a
+            <button
               key={index}
-              href="#"
+              onClick={() => setActiveTab(item.key)}
               className={`group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors duration-150 ${
-                item.active
+                activeTab === item.key
                   ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm border border-gray-200 dark:border-gray-600'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <item.icon className="mr-3 h-5 w-5" />
               {item.label}
-            </a>
+            </button>
           ))}
         </nav>
 
@@ -69,24 +77,24 @@ const Sidebar = () => {
               Workspaces
             </h3>
             <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" onClick={handleAddProject} />
             </button>
           </div>
           <div className="space-y-1 mt-2">
-            {workspaceItems.map((item, index) => (
-              <a
+            {projects.map((project, index) => (
+              <button
                 key={index}
-                href="#"
+                onClick={() => setActiveTab('tasks')}
                 className="group flex items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors duration-150"
               >
                 <div className="flex items-center">
-                  <span className="mr-3 text-base">{item.emoji}</span>
-                  {item.label}
+                  <span className="mr-3 text-base">{project.emoji}</span>
+                  {project.name}
                 </div>
                 <span className="text-xs bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full">
-                  {item.count}
+                  {project.taskCount}
                 </span>
-              </a>
+              </button>
             ))}
           </div>
         </div>

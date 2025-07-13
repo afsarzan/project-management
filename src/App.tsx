@@ -1,19 +1,22 @@
 import React from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AppProvider } from './contexts/AppContext';
 import Sidebar from './components/Sidebar';
 import TopNavigation from './components/TopNavigation';
-import TaskTable from './components/TaskTable';
+import MainContent from './components/MainContent';
 
 function App() {
   return (
     <ThemeProvider>
-      <div className="flex h-screen bg-white dark:bg-gray-900">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <TopNavigation />
-          <TaskTable />
+      <AppProvider>
+        <div className="flex h-screen bg-white dark:bg-gray-900">
+          <Sidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <TopNavigation />
+            <MainContent />
+          </div>
         </div>
-      </div>
+      </AppProvider>
     </ThemeProvider>
   );
 }
