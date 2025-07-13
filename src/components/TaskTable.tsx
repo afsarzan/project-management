@@ -9,7 +9,8 @@ import {
   Flag,
   Flame,
   Edit3,
-  UserPlus
+  UserPlus,
+  Trash2
 } from 'lucide-react';
 import { Task } from '../types';
 
@@ -103,9 +104,9 @@ const TaskTable = () => {
                   </span>
                   <button 
                     onClick={() => handleDeleteTask(task.id)}
-                    className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"
                   >
-                    <MoreHorizontal className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
                 
@@ -294,11 +295,11 @@ const TaskTable = () => {
                   <span className="text-sm text-gray-600 dark:text-gray-400">{task.project}</span>
                 </td>
                 <td className="py-4 px-6">
-                  <button 
+                  <button
                     onClick={() => handleDeleteTask(task.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"
                   >
-                    <MoreHorizontal className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </td>
               </tr>
