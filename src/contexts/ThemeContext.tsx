@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark' | 'system';
+type Theme = 'light' | 'dark' | 'system' | 'ocean' | 'forest' | 'sunset';
 
 interface ThemeContextType {
   theme: Theme;
@@ -31,14 +31,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     const updateTheme = () => {
+      document.documentElement.classList.remove('dark', 'light', 'ocean', 'forest', 'sunset');
       if (theme === 'system') {
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         setIsDark(systemPrefersDark);
         document.documentElement.classList.toggle('dark', systemPrefersDark);
       } else {
-        const shouldBeDark = theme === 'dark';
+        const shouldBeDark = theme === 'dark' || theme === 'ocean' || theme === 'forest' || theme === 'sunset';
         setIsDark(shouldBeDark);
-        document.documentElement.classList.toggle('dark', shouldBeDark);
+        document.documentElement.classList.add(theme);
       }
     };
 

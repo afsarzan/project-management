@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  .ocean {
+    --color-primary: 200 100% 50%;
+    --color-secondary: 220 80% 60%;
+    --color-background: 210 40% 98%;
+    --color-text: 210 40% 10%;
+  }
+  .forest {
+    --color-primary: 120 60% 40%;
+    --color-secondary: 100 40% 50%;
+    --color-background: 90 20% 95%;
+    --color-text: 120 60% 10%;
+  }
+  .sunset {
+    --color-primary: 30 100% 50%;
+    --color-secondary: 10 80% 60%;
+    --color-background: 20 40% 98%;
+    --color-text: 10 40% 10%;
+  }
+}

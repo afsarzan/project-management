@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { 
-  Settings as SettingsIcon, 
-  User, 
-  Bell, 
-  Shield, 
-  Palette, 
-  Database,
-  Download,
-  Upload,
-  Trash2,
-  Save
-} from 'lucide-react';
+import ThemeSelector from './ThemeSelector';
 
 const Settings = () => {
   const { currentUser, tasks, projects, goals, documents, events, automations } = useApp();
@@ -130,33 +119,7 @@ const Settings = () => {
   );
 
   const renderAppearanceSection = () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Theme</h3>
-        <div className="space-y-3">
-          {[
-            { value: 'light', label: 'Light', description: 'Clean and bright interface' },
-            { value: 'dark', label: 'Dark', description: 'Easy on the eyes in low light' },
-            { value: 'system', label: 'System', description: 'Follow your system preference' },
-          ].map((option) => (
-            <label key={option.value} className="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
-              <input
-                type="radio"
-                name="theme"
-                value={option.value}
-                checked={theme === option.value}
-                onChange={(e) => setTheme(e.target.value as any)}
-                className="mr-3"
-              />
-              <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">{option.label}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{option.description}</p>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
-    </div>
+    <ThemeSelector />
   );
 
   const renderPrivacySection = () => (

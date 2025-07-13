@@ -8,6 +8,8 @@ interface AppContextType {
   setActiveTab: (tab: NavigationItem) => void;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+  isSidebarCollapsed: boolean;
+  toggleSidebar: () => void;
   
   // Tasks
   tasks: Task[];
@@ -88,6 +90,7 @@ const defaultProjects: Project[] = [
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useLocalStorage<NavigationItem>('activeTab', 'tasks');
   const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'list');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useLocalStorage<boolean>('isSidebarCollapsed', false);
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', []);
   const [projects, setProjects] = useLocalStorage<Project[]>('projects', defaultProjects);
   const [users, setUsers] = useLocalStorage<User[]>('users', defaultUsers);
@@ -238,12 +241,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setAutomations(prev => prev.filter(automation => automation.id !== id));
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(prev => !prev);
+  };
+
   return (
     <AppContext.Provider value={{
       activeTab,
       setActiveTab,
       viewMode,
       setViewMode,
+      isSidebarCollapsed,
+      toggleSidebar,
       tasks,
       setTasks,
       addTask,
