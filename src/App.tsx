@@ -1,6 +1,6 @@
 import React from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { AppProvider } from './contexts/AppContext';
+
 import Sidebar from './components/Sidebar';
 import TopNavigation from './components/TopNavigation';
 import MainContent from './components/MainContent';
