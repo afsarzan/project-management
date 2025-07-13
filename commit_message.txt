@@ -1,0 +1,5 @@
+feat: Implement collapsible sidebar and theme selection
+
+- Adds a collapsible sidebar to improve screen real estate. The sidebar state is managed globally in AppContext.
+- Introduces a theme selector in the settings page, allowing users to choose from multiple themes (Light, Dark, System, Ocean, Forest, Sunset).
+- Replaces the task deletion icon with a more intuitive trash icon and adds a red hover effect for better UX.
