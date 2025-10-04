@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeSelector from './ThemeSelector';
+import { User, Bell, Palette, Shield, Database, Save, Download, Upload, Trash2 } from 'lucide-react';
 
 const Settings = () => {
   const { currentUser, tasks, projects, goals, documents, events, automations } = useApp();

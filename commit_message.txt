@@ -1,1 +1,1 @@
-chore: configure gh-pages deployment
+fix: Remove duplicate AppProvider import
