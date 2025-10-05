@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 .env
 \"commit_message.txt\" 
+.next
+next-env.d.ts
+/build
+/build
